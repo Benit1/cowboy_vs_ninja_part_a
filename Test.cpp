@@ -9,8 +9,7 @@
 #include "sources/TrainedNinja.hpp"
 #include "sources/OldNinja.hpp"
 #include "sources/Team.hpp"
-#include "sources/Team2.hpp"
-#include "sources/SmartTeam.hpp"
+#include <iostream>
 
 using namespace ariel;
 
@@ -119,6 +118,32 @@ TEST_CASE("Test point Class: Distance method") {
     CHECK_EQ(p4.distance(p1), 11);
     CHECK_EQ(p2.distance(p5), 7);
     CHECK_EQ(p1.distance(p1), 0);
+}
+
+TEST_CASE("Character actions with death") {
+    Point gotenPos(2, 2);
+    Point kakarotoPos(3, 3);
+    Point hattoriHanzoPos(4, 4);
+    Point luckyLukePos(5, 5);
+    Cowboy luckyLuke("Lucky Luke", luckyLukePos);
+    YoungNinja goten("Goten", gotenPos);
+    TrainedNinja kakaroto("Kakaroto", kakarotoPos);
+    OldNinja hattoriHanzo("Hattori Hanzo", hattoriHanzoPos);
+    auto performAttack = [](auto &attacker, auto &victim) {
+        while (victim.isAlive()) {
+            attacker.slash(&victim);
+        }
+    };
+// Perform attacks until death
+    performAttack(goten, hattoriHanzo);
+    performAttack(goten, kakaroto);
+    performAttack(goten, luckyLuke);
+    // Calling the attacking method of a dead character should throw an exception
+    CHECK_THROWS_AS(hattoriHanzo.slash(&goten), std::runtime_error);
+    CHECK_THROWS_AS(kakaroto.slash(&goten), std::runtime_error);
+    CHECK_THROWS_AS(luckyLuke.shoot(&goten), std::runtime_error);
+// Dead cowboy can't reload
+    CHECK_THROWS_AS(luckyLuke.reload(), std::runtime_error);
 }
 
 
